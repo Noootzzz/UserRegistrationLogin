@@ -3,6 +3,7 @@ import mysql from 'mysql2'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import dotenv from 'dotenv'
+import cookieParser from 'cookie-parser'
 
 // Import routes
 import authRoutes from './routes/auth.js'
@@ -28,8 +29,10 @@ db.connect((error) => {
     console.log(`APP DATABASE CONNEXION ===> OK`)
 })
 
-// Create an Express application
+// Initialize express app
 const app = express()
+app.use(express.urlencoded({ extended: true }))
+app.use(cookieParser())
 
 const publicDirectory = path.join(__dirname, './public')
 app.use(express.static(publicDirectory))

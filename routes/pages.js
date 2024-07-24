@@ -1,4 +1,6 @@
 import express from 'express'
+import protect from '../middleware/authMiddleware.js'
+import {logout} from '../controllers/authController.js'
 
 const router = express.Router()
 
@@ -11,8 +13,11 @@ router.get('/register', (req, res) => {
 router.get('/login', (req, res) => {
     res.render('login')
 })
-router.get('/home', (req, res) => {
+router.get('/home', protect, (req, res) => {
     res.render('home')
+})
+router.get('/logout', logout, (req, res) => {
+    res.render('login')
 })
 
 export default router

@@ -3,7 +3,7 @@ import dotenv from 'dotenv'
 import { fileURLToPath } from 'url'
 import path from 'path'
 import bcrypt from 'bcryptjs'
-import session from 'express-session'
+import jwt from 'jsonwebtoken'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -47,7 +47,7 @@ const register = (req, res) => {
         db.query('INSERT INTO users SET ?', { name: name, email: email, password: hashedPassword }, (error, result) => {
             if (error) throw error
             try {
-                return res.redirect('/home')
+                return res.redirect('/login')
             } catch (error) {
                 console.error(error)
                 return res.render('register', console.log(`Error register: ${error}`))
@@ -60,7 +60,6 @@ const register = (req, res) => {
 const login = (req, res) => {
     const { email, password } = req.body
 
-    // Vérifiez si l'utilisateur existe dans la base de données
     db.query('SELECT * FROM users WHERE email = ?', [email], async (error, result) => {
         if (error) throw error
 
@@ -72,9 +71,7 @@ const login = (req, res) => {
 
         const user = result[0]
 
-        // Comparer le mot de passe entré avec le mot de passe haché stocké
         const isMatch = await bcrypt.compare(password, user.password)
-
 
         if (!isMatch) {
             return res.render('login', {
@@ -82,15 +79,28 @@ const login = (req, res) => {
             })
         }
 
-        // Si le mot de passe correspond, créer une session pour l'utilisateur et le rediriger vers la page d'accueil
-        try {
-            return res.redirect('/home')
-        } catch (error) {
-            console.error(error)
-            return res.render('login', console.log(`Error login: ${error}`))
-        }
+        const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
+            expiresIn: process.env.JWT_EXPIRES_IN
+        })
 
+        res.cookie('jwt', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            maxAge: process.env.JWT_COOKIE_EXPIRES * 24 * 60 * 60 * 1000
+        })
+
+        return res.redirect('/home')
     })
 }
 
-export { register, login }
+// Logout function
+const logout = (req, res) => {
+    res.cookie('jwt', 'logout', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        expires: new Date(0)
+    })
+    res.redirect('/login')
+}
+
+export { register, login, logout }
