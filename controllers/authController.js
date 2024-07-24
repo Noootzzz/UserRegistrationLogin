@@ -21,10 +21,7 @@ const db = mysql.createConnection({
 
 // Connect to the database
 db.connect((error) => {
-    if (error) {
-        console.error('Database connection error:', error)
-        return
-    }
+    if (error) throw error
     console.log('AUTHCONTROLLER DATABASE CONNEXION ===> OK')
 })
 
@@ -47,6 +44,14 @@ const register = (req, res) => {
 
         let hashedPassword = await bcrypt.hash(password, 8)
         console.log(hashedPassword)
+
+        db.query('INSERT INTO users SET ?', {name: name, email: email, password: hashedPassword}, (error, result) => {
+            if (error) throw error
+            console.log(result)
+            return res.render('register', {
+                message: 'User Registered!'
+            })
+        })
     })
 }
 
