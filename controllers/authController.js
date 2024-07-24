@@ -22,16 +22,19 @@ const db = mysql.createConnection({
 // Connect to the database
 db.connect((error) => {
     if (error) throw error
-    console.log('AUTHCONTROLLER DATABASE CONNEXION ===> OK')
+    console.log('AUTHCONTROLLER DATABASE CONNECTION ===> OK')
 })
 
-const register = (req, res) => {
-    console.log(req.body)
+// Secret key for JWT
+const JWT_SECRET = process.env.JWT_SECRET
 
+// Register function
+const register = (req, res) => {
     const { name, email, password, passwordConfirm } = req.body
 
     db.query('SELECT email FROM users WHERE email = ?', [email], async (error, result) => {
         if (error) throw error
+
         if (result.length > 0) {
             return res.render('register', {
                 message: 'That email is already used!'
@@ -43,16 +46,45 @@ const register = (req, res) => {
         }
 
         let hashedPassword = await bcrypt.hash(password, 8)
-        console.log(hashedPassword)
 
         db.query('INSERT INTO users SET ?', {name: name, email: email, password: hashedPassword}, (error, result) => {
             if (error) throw error
-            console.log(result)
-            return res.render('register', {
-                message: 'User Registered!'
-            })
+            return res.render('home') // Redirect to home or login page
         })
     })
 }
 
-export default register
+// Login function
+const login = (req, res) => {
+    const { email, password } = req.body
+
+    db.query('SELECT * FROM users WHERE email = ?', [email], async (error, result) => {
+        if (error) throw error
+
+        if (result.length === 0) {
+            return res.status(401).json({ message: 'Invalid email or password' })
+        }
+
+        const user = result[0]
+        const isMatch = await bcrypt.compare(password, user.password)
+
+        if (!isMatch) {
+            return res.status(401).json({ message: 'Invalid email or password' })
+        }
+
+        // Create JWT token
+        const token = jwt.sign(
+            { id: user.id, email: user.email },
+            JWT_SECRET,
+            { expiresIn: '1h' } // Token expiration time
+        )
+
+        res.cookie("token", token, {
+            httpOnly: true,
+        })
+
+        return res.redirect('/home')
+    })
+}
+
+export { register, login }

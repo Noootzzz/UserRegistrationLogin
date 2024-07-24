@@ -10,7 +10,6 @@ import authRoutes from './routes/auth.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
-
 dotenv.config({
     path: './.env'
 })
@@ -20,6 +19,11 @@ const db = mysql.createConnection({
     user: process.env.DATABASE_USER,
     password: process.env.DATABASE_PASSWORD,
     database: process.env.DATABASE
+})
+
+db.connect((error) => {
+    if (error) throw error
+    console.log(`APP DATABASE CONNEXION ===> OK`)
 })
 
 const app = express()
@@ -33,11 +37,6 @@ app.use(express.urlencoded({ extended: false }))
 app.use(express.json())
 
 app.set('view engine', 'hbs')
-
-db.connect((error) => {
-    if (error) throw error
-    console.log(`APP DATABASE CONNEXION ===> OK`)
-})
 
 //DEFINE ROUTES
 app.use('/', pagesRoutes)
