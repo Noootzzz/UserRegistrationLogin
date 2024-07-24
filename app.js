@@ -3,6 +3,10 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import mysql from 'mysql'
 import dotenv from 'dotenv'
+import pagesRoutes from './routes/pages.js'
+import authRoutes from './routes/auth.js'
+
+
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -23,6 +27,11 @@ const db = mysql.createConnection({
 const publicDirectory = path.join(__dirname, './public')
 app.use(express.static(publicDirectory))
 
+// PARSE URL ENCODED BODIES
+app.use(express.urlencoded({ extended: false }))
+// PARSE JSON BODIES
+app.use(express.json())
+
 app.set('view engine', 'hbs')
 
 db.connect((error) => {
@@ -30,15 +39,10 @@ db.connect((error) => {
     console.log(`DATABASE CONNEXION ===> OK`)
 })
 
-app.get('/', (req, res) => {
-    // res.send("<h1>Home</h1>")
-    res.render("index")
-})
 
-app.get('/register', (req, res) => {
-    // res.send("<h1>Home</h1>")
-    res.render("register")
-})
+//DEFINE ROUTES
+app.use('/', pagesRoutes)
+app.use('/auth', authRoutes)
 
 app.listen(process.env.PORT, () => {
     console.log(`SERVER ON PORT: ${process.env.PORT} ===> OK`)
