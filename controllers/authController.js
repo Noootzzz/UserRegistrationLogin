@@ -3,7 +3,7 @@ import dotenv from 'dotenv'
 import { fileURLToPath } from 'url'
 import path from 'path'
 import bcrypt from 'bcryptjs'
-import jwt from 'jsonwebtoken'
+import session from 'express-session'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -25,9 +25,6 @@ db.connect((error) => {
     console.log('AUTHCONTROLLER DATABASE CONNECTION ===> OK')
 })
 
-// Secret key for JWT
-const JWT_SECRET = process.env.JWT_SECRET
-
 // Register function
 const register = (req, res) => {
     const { name, email, password, passwordConfirm } = req.body
@@ -47,9 +44,14 @@ const register = (req, res) => {
 
         let hashedPassword = await bcrypt.hash(password, 8)
 
-        db.query('INSERT INTO users SET ?', {name: name, email: email, password: hashedPassword}, (error, result) => {
+        db.query('INSERT INTO users SET ?', { name: name, email: email, password: hashedPassword }, (error, result) => {
             if (error) throw error
-            return res.render('home') // Redirect to home or login page
+            try {
+                return res.redirect('/home')
+            } catch (error) {
+                console.error(error)
+                return res.render('register', console.log(`Error register: ${error}`))
+            }
         })
     })
 }
@@ -58,32 +60,36 @@ const register = (req, res) => {
 const login = (req, res) => {
     const { email, password } = req.body
 
+    // Vérifiez si l'utilisateur existe dans la base de données
     db.query('SELECT * FROM users WHERE email = ?', [email], async (error, result) => {
         if (error) throw error
 
-        if (result.length === 0) {
-            return res.status(401).json({ message: 'Invalid email or password' })
+        if (result.length <= 0) {
+            return res.render('login', {
+                message: 'Email or password is incorrect!'
+            })
         }
 
         const user = result[0]
+
+        // Comparer le mot de passe entré avec le mot de passe haché stocké
         const isMatch = await bcrypt.compare(password, user.password)
 
+
         if (!isMatch) {
-            return res.status(401).json({ message: 'Invalid email or password' })
+            return res.render('login', {
+                message: 'Email or password is incorrect!'
+            })
         }
 
-        // Create JWT token
-        const token = jwt.sign(
-            { id: user.id, email: user.email },
-            JWT_SECRET,
-            { expiresIn: '1h' } // Token expiration time
-        )
+        // Si le mot de passe correspond, créer une session pour l'utilisateur et le rediriger vers la page d'accueil
+        try {
+            return res.redirect('/home')
+        } catch (error) {
+            console.error(error)
+            return res.render('login', console.log(`Error login: ${error}`))
+        }
 
-        res.cookie("token", token, {
-            httpOnly: true,
-        })
-
-        return res.redirect('/home')
     })
 }
 

@@ -3,11 +3,13 @@ import mysql from 'mysql2'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import dotenv from 'dotenv'
-import pagesRoutes from './routes/pages.js'
+
+// Import routes
 import authRoutes from './routes/auth.js'
+import pagesRoutes from './routes/pages.js'
 
 
-
+// Load environment variables
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 dotenv.config({
@@ -26,22 +28,25 @@ db.connect((error) => {
     console.log(`APP DATABASE CONNEXION ===> OK`)
 })
 
+// Create an Express application
 const app = express()
 
 const publicDirectory = path.join(__dirname, './public')
 app.use(express.static(publicDirectory))
 
-// PARSE URL ENCODED BODIES
+// Middleware
 app.use(express.urlencoded({ extended: false }))
-// PARSE JSON BODIES
 app.use(express.json())
+app.use(express.static(path.join(__dirname, 'public')))
 
+// Set up view engine
 app.set('view engine', 'hbs')
 
-//DEFINE ROUTES
+// Routes
 app.use('/', pagesRoutes)
 app.use('/auth', authRoutes)
 
+// Start the server
 app.listen(process.env.PORT, () => {
     console.log(`SERVER LISTENING AT http://localhost:${process.env.PORT} ===> OK`)
 })
