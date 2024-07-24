@@ -3,9 +3,10 @@ import { register, login, logout } from '../controllers/authController.js'
 
 const router = express.Router()
 
-// Routes
+// Auth routes
 router.post('/register', register)
 router.post('/login', login)
+// Logout route
 router.get('/logout')
 
 export default router

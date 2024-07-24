@@ -13,11 +13,11 @@ router.get('/register', (req, res) => {
 router.get('/login', (req, res) => {
     res.render('login')
 })
+router.get('/logout', logout, (req, res) => {
+    res.redirect('login')
+})
 router.get('/home', protect, (req, res) => {
     res.render('home')
-})
-router.get('/logout', logout, (req, res) => {
-    res.render('login')
 })
 
 export default router
