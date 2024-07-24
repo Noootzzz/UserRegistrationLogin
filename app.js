@@ -35,6 +35,11 @@ app.get('/', (req, res) => {
     res.render("index")
 })
 
+app.get('/register', (req, res) => {
+    // res.send("<h1>Home</h1>")
+    res.render("register")
+})
+
 app.listen(process.env.PORT, () => {
     console.log(`SERVER ON PORT: ${process.env.PORT} ===> OK`)
 })
