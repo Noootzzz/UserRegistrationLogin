@@ -95,12 +95,12 @@ const login = (req, res) => {
 
 // Logout function
 const logout = (req, res) => {
-    res.cookie('jwt', 'logout', {
+    res.cookie('jwt', '', {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        expires: new Date(0)
-    })
+        expires: new Date(0) // Réinitialiser le cookie
+    });
     res.redirect('/login')
-}
+};
 
 export { register, login, logout }
