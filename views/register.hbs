@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/style.css">
     <title>Document</title>
 </head>
+
 <body>
     <nav>
         <h4>Node MYSQL</h4>
@@ -38,10 +40,20 @@
                         <input type="password" class="form-control" id="password" name="password">
                     </div>
 
+                    <div class="form-group">
+                        <label for="passwordConfirm">Confirm Password</label>
+                        <input type="password" class="form-control" id="passwordConfirm" name="passwordConfirm">
+                    </div>
+
                     <button type="submit">Register User</button>
                 </form>
             </div>
         </div>
+
+        {{#if message}}
+        <h4 class="alert">{{message}}</h4>
+        {{/if}}
     </div>
 </body>
+
 </html>

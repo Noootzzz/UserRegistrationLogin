@@ -1,7 +1,7 @@
 import express from 'express'
+import mysql from 'mysql2'
 import path from 'path'
 import { fileURLToPath } from 'url'
-import mysql from 'mysql'
 import dotenv from 'dotenv'
 import pagesRoutes from './routes/pages.js'
 import authRoutes from './routes/auth.js'
@@ -15,14 +15,17 @@ dotenv.config({
     path: './.env'
 })
 
-const app = express()
 
 const db = mysql.createConnection({
     host: process.env.DATABASE_HOST,
     user: process.env.DATABASE_USER,
     password: process.env.DATABASE_PASSWORD,
-    database: process.env.DATABASE //.env value
+    database: process.env.DATABASE
 })
+
+
+
+const app = express()
 
 const publicDirectory = path.join(__dirname, './public')
 app.use(express.static(publicDirectory))
@@ -36,9 +39,8 @@ app.set('view engine', 'hbs')
 
 db.connect((error) => {
     if (error) throw error
-    console.log(`DATABASE CONNEXION ===> OK`)
+    console.log(`APP DATABASE CONNEXION ===> OK`)
 })
-
 
 //DEFINE ROUTES
 app.use('/', pagesRoutes)
