@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+</head>
+
+<body>
+    <h1>Register</h1>
+    <form id="registerForm" action="/api/register" method="POST">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required><br>
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required><br>
+
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required><br>
+
+        <button type="submit">Register</button>
+    </form>
+
+    <div id="auth-message"></div> <!-- Div pour afficher les messages -->
+
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', async function (event) {
+            event.preventDefault();
+
+            const formData = new FormData(this);
+            const response = await fetch('/api/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams(formData)
+            });
+
+            const result = await response.json();
+
+            const messageDiv = document.getElementById('auth-message');
+            if (response.ok) {
+                // Afficher le message de succès et rediriger
+                messageDiv.textContent = result.msg;
+                setTimeout(() => {
+                    window.location.href = '/log';
+                }, 1500); // Attendre 1.5 secondes avant de rediriger vers la page de login
+            } else {
+                // Afficher le message d'erreur
+                messageDiv.textContent = result.msg;
+            }
+        });
+    </script>
+</body>
+
+</html>
