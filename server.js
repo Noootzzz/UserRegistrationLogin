@@ -32,6 +32,7 @@ app.use(express.static(path.resolve('public')))
 
 // Utiliser les routes API
 app.use('/api', userRouter)
+
 // Route pour le formulaire d'inscription
 app.get('/reg', (req, res) => {
     res.sendFile(path.resolve('views/register.html'))

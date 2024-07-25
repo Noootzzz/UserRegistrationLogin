@@ -82,7 +82,7 @@ const login = async (req, res) => {
 
         // Générer un token JWT
         const token = jwt.sign(
-            { id: user.id, email: user.email },
+            { id: user.id },
             process.env.JWT_SECRET,
             { expiresIn: process.env.JWT_EXPIRATION }
         )
@@ -103,5 +103,19 @@ const logout = (req, res) => {
     res.json({ msg: 'Logout successful' });
 };
 
+const getUserDatas = async (req, res) => {
+    try {
+        const connection = await createConnection();
+        const [rows] = await connection.execute('SELECT name, email FROM users WHERE id = ?', [req.user.id]);
+        if (rows.length === 0) {
+            return res.status(404).json({ msg: 'User not found' });
+        }
+        const user = rows[0];
+        res.json({ name: user.name, email: user.email });
+    } catch (err) {
+        console.error('Error fetching user data:', err);
+        return res.status(500).json({ msg: 'Internal server error' });
+    }
+};
 
-export { register, login, logout }
+export { register, login, logout, getUserDatas }

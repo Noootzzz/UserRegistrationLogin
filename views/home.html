@@ -9,14 +9,37 @@
 
 <body>
     <h1>Home</h1>
+    <div id="userInfo">
+        <!-- Les informations de l'utilisateur seront affichées ici -->
+    </div>
     <button id="logoutButton">Logout</button>
 
     <script>
+        async function fetchUserDatas() {
+            try {
+                const response = await fetch('/api/user', {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+                if (response.ok) {
+                    const userData = await response.json();
+                    document.getElementById('userInfo').innerHTML = `
+                        <p>Name: ${userData.name}</p>
+                        <p>Email: ${userData.email}</p>
+                    `;
+                } else {
+                    console.error('Failed to fetch user data');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
         document.getElementById('logoutButton').addEventListener('click', async () => {
             try {
                 const response = await fetch('/api/logout', {
                     method: 'POST',
-                    credentials: 'include'  // Assurez-vous que les cookies sont inclus dans la requête
+                    credentials: 'include'
                 });
 
                 if (response.ok) {
@@ -28,6 +51,9 @@
                 console.error('Error:', error);
             }
         });
+
+        // Appeler la fonction pour récupérer et afficher les données de l'utilisateur
+        fetchUserDatas();
     </script>
 </body>
 

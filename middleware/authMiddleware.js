@@ -16,11 +16,11 @@ const authenticateToken = (req, res, next) => {
         return res.sendStatus(401);  // Unauthorized
     }
 
-    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
         if (err) {
             return res.sendStatus(403);  // Forbidden
         }
-        req.user = user;
+        req.user = { id: decoded.id };
         next();
     });
 };
