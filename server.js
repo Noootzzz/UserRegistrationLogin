@@ -3,8 +3,10 @@ import express from 'express'
 import path from 'path'
 import cors from 'cors'
 import bodyParser from 'body-parser'
+import cookieParser from 'cookie-parser';
 import createConnection from './config/dbConnection.js'
 import userRouter from './routes/userRoutes.js'
+import authenticateToken from './middleware/authMiddleware.js'
 
 // Charger les variables d'environnement .env
 config()
@@ -17,6 +19,7 @@ app.use(express.json())  // Pour traiter les JSON dans le corps de la requête
 app.use(bodyParser.json())  // Pour traiter les données JSON
 app.use(bodyParser.urlencoded({ extended: true }))  // Pour traiter les données URL-encodées
 app.use(cors())  // Pour permettre les requêtes cross-origin
+app.use(cookieParser())
 
 // Connexion à la base de données
 createConnection().catch(err => {
@@ -38,7 +41,7 @@ app.get('/log', (req, res) => {
     res.sendFile(path.resolve('views/login.html'))
 })
 // Route pour la page d'accueil
-app.get('/home', (req, res) => {
+app.get('/home', authenticateToken, (req, res) => {
     res.sendFile(path.resolve('views/home.html'))
 })
 

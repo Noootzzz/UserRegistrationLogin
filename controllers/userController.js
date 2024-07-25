@@ -1,6 +1,18 @@
 import { validationResult } from 'express-validator'
 import bcrypt from 'bcryptjs'
+import jwt from 'jsonwebtoken'
 import createConnection from '../config/dbConnection.js'
+import dotenv from 'dotenv'
+import path from 'path'
+import { fileURLToPath } from 'url'
+
+// Get the directory name of the current module file
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+
+// Load environment variables from .env file located in the parent directory
+dotenv.config({ path: path.resolve(__dirname, '../.env') })
+
 
 const register = async (req, res) => {
     const errors = validationResult(req)
@@ -31,7 +43,7 @@ const register = async (req, res) => {
         )
 
         // Return a success message
-        res.status(201).json({ msg: 'User registered successfully!' })
+        res.status(201).json({ msg: 'Registered!' })
 
     } catch (err) {
         console.error('Registration error:', err)
@@ -67,8 +79,18 @@ const login = async (req, res) => {
             return res.status(401).json({ msg: 'Invalid password!' })  // Mot de passe incorrect
         }
 
+
+        // Générer un token JWT
+        const token = jwt.sign(
+            { id: user.id, email: user.email },
+            process.env.JWT_SECRET,
+            { expiresIn: process.env.JWT_EXPIRATION }
+        )
+
+         // Envoyer le token dans un cookie HTTP-only
+         res.cookie('token', token, { httpOnly: true, secure: true, sameSite: 'strict' });
         // Connexion réussie, renvoyer un message de succès
-        res.status(200).json({ msg: 'Login successful!' })
+        res.status(200).json({ msg: 'Logged in!' })
 
     } catch (err) {
         console.error('Login error:', err)
@@ -76,5 +98,10 @@ const login = async (req, res) => {
     }
 }
 
+const logout = (req, res) => {
+    res.clearCookie('token', { httpOnly: true, secure: true, sameSite: 'strict' });
+    res.json({ msg: 'Logout successful' });
+};
 
-export { register, login }
+
+export { register, login, logout }

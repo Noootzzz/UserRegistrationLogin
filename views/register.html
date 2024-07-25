@@ -45,10 +45,14 @@
                 messageDiv.textContent = result.msg;
                 setTimeout(() => {
                     window.location.href = '/log';
-                }, 1500); // Attendre 1.5 secondes avant de rediriger vers la page de login
+                }, 1500); // Attendre 2 secondes avant de rediriger
             } else {
-                // Afficher le message d'erreur
-                messageDiv.textContent = result.msg;
+                // Afficher les messages d'erreur
+                if (result.errors) {
+                    messageDiv.textContent = result.msg;
+                } else {
+                    messageDiv.textContent = result.msg;
+                }
             }
         });
     </script>
