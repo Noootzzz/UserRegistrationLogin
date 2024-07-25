@@ -2,25 +2,16 @@
   "name": "userregistrationlogin",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
-  "type": "module",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon app"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "bcryptjs": "^2.4.3",
-    "cookie-parser": "^1.4.6",
-    "dotenv": "^16.4.5",
+    "cors": "^2.8.5",
     "express": "^4.19.2",
-    "express-session": "^1.18.0",
-    "hbs": "^4.2.0",
-    "jsonwebtoken": "^9.0.2",
-    "mysql": "^2.18.1",
-    "mysql2": "^3.10.3",
-    "nodemon": "^3.1.4"
+    "mysql": "^2.18.1"
   }
 }
