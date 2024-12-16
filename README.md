@@ -31,7 +31,7 @@ UserRegistrationLogin is a Node.js-based project that provides user registration
    ```
 
 4. **Access the application**:
-   - Open your browser and navigate to `http://localhost:3000`.
+   - Open your browser and navigate to `http://localhost:5000`.
 
 ## Project Structure
 
